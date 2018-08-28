@@ -1,4 +1,4 @@
-module Types exposing (Board, Cell(..), Player(..), GameState(..), GameOver(..))
+module Types exposing (Board, Cell(..), GameOver(..), GameState(..), Player(..))
 
 
 type Player

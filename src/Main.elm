@@ -1,10 +1,11 @@
-module Main exposing (..)
+module Main exposing (Model, Msg(..), OnMove, app, board, cell, currentPlayer, dispatchCellValue, dispatchPlayer, game, gameOver, gameOverPlayer, initialModel, main, nextMove, nextPlayer, player, playerO, playerOImage, playerOM, playerOS, playerX, playerXImage, playerXM, playerXS, preloadImages, restartImage, row, update, view)
 
+import GameLogic
 import Html exposing (..)
 import Html.Attributes as A
 import Html.Events as E
 import Types exposing (..)
-import GameLogic
+import Browser
 
 
 type alias Model =
@@ -28,8 +29,8 @@ initialModel =
 
 
 nextPlayer : Player -> Player
-nextPlayer player =
-    case player of
+nextPlayer player_ =
+    case player_ of
         PlayerX ->
             PlayerO
 
@@ -49,11 +50,11 @@ nextMove ( x, y ) model =
         newGameState =
             GameLogic.getGameState newBoard
     in
-        { model
-            | board = newBoard
-            , currentPlayer = nextPlayer_
-            , gameState = newGameState
-        }
+    { model
+        | board = newBoard
+        , currentPlayer = nextPlayer_
+        , gameState = newGameState
+    }
 
 
 update : Msg -> Model -> Model
@@ -62,6 +63,7 @@ update msg model =
         Move ( x, y ) ->
             if GameLogic.canUpdateBoard ( x, y ) model.board then
                 nextMove ( x, y ) model
+
             else
                 model
 
@@ -163,8 +165,8 @@ board onMove board_ =
 
 
 dispatchPlayer : Player -> Html Msg
-dispatchPlayer player =
-    case player of
+dispatchPlayer player_ =
+    case player_ of
         PlayerX ->
             playerXS
 
@@ -191,10 +193,10 @@ game onMove board_ currentPlayer_ =
 
 
 gameOverPlayer : Player -> Html Msg
-gameOverPlayer player =
+gameOverPlayer player_ =
     span []
         [ text "Player"
-        , case player of
+        , case player_ of
             PlayerX ->
                 playerXS
 
@@ -219,8 +221,8 @@ gameOver onRestart gameOver_ =
                 Draw ->
                     text "It's a draw"
 
-                Winner player ->
-                    gameOverPlayer player
+                Winner player_ ->
+                    gameOverPlayer player_
             ]
         ]
 
@@ -252,10 +254,10 @@ view model =
     div [] (app model :: preloadImages)
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.beginnerProgram
-        { model = initialModel
+    Browser.sandbox
+        { init = initialModel
         , update = update
         , view = view
         }

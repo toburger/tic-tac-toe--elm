@@ -1,7 +1,7 @@
-module GameLogic exposing (getGameState, createBoard, updateBoard, canUpdateBoard, getField)
+module GameLogic exposing (canUpdateBoard, createBoard, getField, getGameState, updateBoard)
 
-import Types exposing (..)
 import List.Extra as List
+import Types exposing (..)
 
 
 times : Int -> List Int
@@ -31,6 +31,7 @@ updateBoard ( x, y ) v board =
                         (\y_ v_ ->
                             if x_ == x && y_ == y then
                                 v
+
                             else
                                 v_
                         )
@@ -66,7 +67,7 @@ checkDiagonalsForWinner : Cell -> Board -> Bool
 checkDiagonalsForWinner v board =
     let
         getField_ =
-            flip getField board
+            \a -> getField a board
 
         diag1 =
             [ getField_ ( 0, 0 ), getField_ ( 1, 1 ), getField_ ( 2, 2 ) ]
@@ -74,8 +75,8 @@ checkDiagonalsForWinner v board =
         diag2 =
             [ getField_ ( 2, 0 ), getField_ ( 1, 1 ), getField_ ( 0, 2 ) ]
     in
-        [ diag1, diag2 ]
-            |> List.any (List.all ((==) (Just v)))
+    [ diag1, diag2 ]
+        |> List.any (List.all ((==) (Just v)))
 
 
 checkForWinner : Cell -> Board -> Bool
@@ -94,9 +95,12 @@ getGameState : Board -> GameState
 getGameState board =
     if checkForWinner (Player PlayerX) board then
         GameOver (Winner PlayerX)
+
     else if checkForWinner (Player PlayerO) board then
         GameOver (Winner PlayerO)
+
     else if checkForDraw board then
         GameOver Draw
+
     else
         Continue
